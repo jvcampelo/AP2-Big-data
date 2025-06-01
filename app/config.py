@@ -1,0 +1,9 @@
+import os
+
+class Config:
+    SQLALCHEMY_DATABASE_URI = os.getenv("")
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    AZURE_COSMOS_URI = ""
+    AZURE_COSMOS_KEY = ""
+    AZURE_COSMOS_DATABASE = ""
