@@ -4,9 +4,10 @@ from app.database import db
 from app.models.pedido import Pedido
 from datetime import datetime
 from app.models.usuario import Usuario
+from app.cosmosdb import container
 
 # Criando namespace para o Swagger
-ns = Namespace('pedidos', description='Operações relacionadas a pedidos')
+ns = Namespace('pedido', description='Operações relacionadas a pedidos')
 
 # Modelos para documentação do Swagger
 pedido_model = ns.model('Pedido', {
@@ -35,20 +36,29 @@ class PedidoList(Resource):
     def post(self):
         """Cria um novo pedido"""
         dados = request.json
-        if not dados.get("nome_cliente") or not dados.get("nome_produto") or not dados.get("valor_total"):
-            ns.abort(400, "Nome do cliente, nome dos produtos, preço e data da compra são obrigatórios")
+        
+        # Validar campos obrigatórios
+        campos_obrigatorios = ["id_usuario", "id_produto", "valor_total", "id_cartao"]
+        for campo in campos_obrigatorios:
+            if not dados.get(campo):
+                ns.abort(400, f"O campo '{campo}' é obrigatório")
 
-        usuario = Usuario.query.filter(Usuario.nome.ilike(dados["nome_cliente"])).first()
+        usuario = Usuario.query.get(dados["id_usuario"])
         if not usuario:
-            ns.abort(404, "Usuário não encontrado para o nome fornecido")
+            ns.abort(404, "Usuário não encontrado")
+
+        # Buscar nome do produto no CosmosDB
+        query = f"SELECT * FROM produtos p WHERE p.id = '{dados['id_produto']}'"
+        produtos = list(container.query_items(query=query, enable_cross_partition_query=True))
+        nome_produto = produtos[0]["nome"] if produtos else "Produto não encontrado"
 
         novo_pedido = Pedido(
-            nome_cliente=dados["nome_cliente"],
+            nome_cliente=usuario.nome,
             data_pedido=datetime.strptime(dados["data_pedido"], "%Y-%m-%d"),
-            nome_produto=dados["nome_produto"],
+            nome_produto=nome_produto,
             valor_total=dados["valor_total"],
-            status=dados["status"],
-            id_usuario=usuario.id
+            status=dados.get("status", "Confirmado"),
+            id_usuario=dados["id_usuario"]
         )
 
         db.session.add(novo_pedido)

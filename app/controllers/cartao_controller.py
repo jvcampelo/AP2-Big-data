@@ -237,3 +237,16 @@ class CartaoResource(Resource):
         except Exception as e:
             ns.abort(500, str(e))
 
+@ns.route('/numero/<string:numero>')
+@ns.param('numero', 'Número do cartão')
+class CartaoPorNumero(Resource):
+    @ns.doc('get_cartao_por_numero')
+    @ns.marshal_with(cartao_model)
+    @ns.response(404, 'Cartão não encontrado')
+    def get(self, numero):
+        """Busca um cartão pelo número"""
+        cartao = Cartao.query.filter_by(numero=numero).first()
+        if not cartao:
+            ns.abort(404, "Cartão não encontrado")
+        return cartao
+
