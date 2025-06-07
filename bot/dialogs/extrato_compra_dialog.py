@@ -137,34 +137,22 @@ class ExtratoCompraDialog(ComponentDialog):
         cartao_info = step_context.values["cartao_info"]
         cartao_id = cartao_info.get("id")
         
-        
-        usuario_id = cartao_info.get("usuario_id")
-        if not usuario_id:
+        if not cartao_id:
             await step_context.context.send_activity(
-                MessageFactory.text("Erro: Usuário do cartão não encontrado.")
+                MessageFactory.text("Erro: ID do cartão não encontrado.")
             )
             return await step_context.end_dialog()
         
-        pedidos = []
+        # Consultar pedidos diretamente pelo ID do cartão
+        pedidos = self.order_api.consultar_pedidos_por_cartao(cartao_id)
         
-        nome_cliente = cartao_info.get('nome_impresso', '')
-        if nome_cliente:
-            pedidos = self.order_api.consultar_pedidos(nome_cliente)
-        
-        pedidos_filtrados = []
-        for pedido in pedidos:
-            if pedido.get('id_cartao') == cartao_id:
-                pedidos_filtrados.append(pedido)
-            elif not pedido.get('id_cartao'):
-                pedidos_filtrados.append(pedido)
-        
-        if not pedidos_filtrados or len(pedidos_filtrados) == 0:
+        if not pedidos:
             await step_context.context.send_activity(
                 MessageFactory.text("Nenhum pedido encontrado neste cartão.")
             )
             return await step_context.replace_dialog("WaterfallDialog")
         
-        await self.exibir_extrato_cards(step_context, cartao_info, pedidos_filtrados)
+        await self.exibir_extrato_cards(step_context, cartao_info, pedidos)
         return await step_context.replace_dialog("WaterfallDialog")
 
     async def exibir_extrato_cards(self, step_context, cartao_info, pedidos):
@@ -198,10 +186,10 @@ class ExtratoCompraDialog(ComponentDialog):
         # Criar card do pedido
         card = CardFactory.hero_card(
             HeroCard(
-                title=f"Pedido #{pedido.get('id', 'N/A')}",
-                subtitle=f"Data: {pedido.get('data', 'N/A')} | Status: {pedido.get('status', 'N/A')}",
-                text=f"**Produto:** {pedido.get('produto', 'N/A')}\n\n"
-                     f"**Valor:** R$ {float(pedido.get('valor', 0)):.2f}",
+                title=f"Pedido #{pedido.get('id_pedido', 'N/A')}",
+                subtitle=f"Data: {pedido.get('data_pedido', 'N/A')} | Status: {pedido.get('status', 'N/A')}",
+                text=f"**Produto:** {pedido.get('nome_produto', 'N/A')}\n\n"
+                     f"**Valor:** R$ {float(pedido.get('valor_total', 0)):.2f}",
                 images=[CardImage(url=imagem_url)] if imagem_url else []
             )
         )

@@ -15,3 +15,4 @@ class Cartao(db.Model):
     atualizado_em = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
     usuario = db.relationship("Usuario", back_populates="cartoes")
+    pedidos = db.relationship("Pedido", back_populates="cartao", lazy=True)

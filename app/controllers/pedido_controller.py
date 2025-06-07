@@ -17,7 +17,8 @@ pedido_model = ns.model('Pedido', {
     'data_pedido': fields.Date(required=True, description='Data do pedido'),
     'valor_total': fields.Float(required=True, description='Valor total do pedido'),
     'status': fields.String(required=True, description='Status do pedido'),
-    'id_usuario': fields.Integer(required=True, description='ID do usuário')
+    'id_usuario': fields.Integer(required=True, description='ID do usuário'),
+    'id_cartao': fields.Integer(required=True, description='ID do cartão')
 })
 
 @ns.route('')
@@ -58,7 +59,8 @@ class PedidoList(Resource):
             nome_produto=nome_produto,
             valor_total=dados["valor_total"],
             status=dados.get("status", "Confirmado"),
-            id_usuario=dados["id_usuario"]
+            id_usuario=dados["id_usuario"],
+            id_cartao=dados["id_cartao"]
         )
 
         db.session.add(novo_pedido)
@@ -112,4 +114,14 @@ class PedidoNomeResource(Resource):
         pedidos = Pedido.query.filter(
             Pedido.nome_cliente.ilike(f"%{nome}%")
         ).all()
+        return pedidos
+
+@ns.route('/cartao/<int:cartao_id>')
+@ns.param('cartao_id', 'ID do cartão')
+class PedidoCartaoResource(Resource):
+    @ns.doc('list_pedidos_por_cartao')
+    @ns.marshal_list_with(pedido_model)
+    def get(self, cartao_id):
+        """Lista pedidos por ID do cartão"""
+        pedidos = Pedido.query.filter_by(id_cartao=cartao_id).all()
         return pedidos

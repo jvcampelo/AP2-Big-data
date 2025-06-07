@@ -13,3 +13,6 @@ class Pedido(db.Model):
 
     id_usuario = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=False)
     usuario = db.relationship("Usuario", back_populates="pedidos", lazy=True)
+    
+    id_cartao = db.Column(db.Integer, db.ForeignKey("cartao.id"), nullable=False)
+    cartao = db.relationship("Cartao", back_populates="pedidos", lazy=True)

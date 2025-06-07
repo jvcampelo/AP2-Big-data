@@ -31,6 +31,31 @@ class OrderAPI:
             print(f"Exceção ao consultar pedidos: {e}")
             return []
 
+    def consultar_pedidos_por_cartao(self, cartao_id):
+        try:
+            url = f"{CONFIG.API_BASE_URL}/pedido/cartao/{cartao_id}"
+            print(f"Consultando pedidos do cartão {cartao_id} na URL: {url}")
+            
+            headers = {
+                'User-Agent': 'IBMEC-Bot/1.0',
+                'Accept': 'application/json'
+            }
+            
+            response = requests.get(url, headers=headers, timeout=30)
+            print(f"Status code da consulta: {response.status_code}")
+            print(f"Resposta da API: {response.text}")
+            
+            if response.status_code == 200:
+                result = response.json()
+                print(f"Pedidos encontrados: {len(result)}")
+                return result
+            else:
+                print(f"Erro ao consultar pedidos do cartão: {response.text}")
+                return []
+        except Exception as e:
+            print(f"Exceção ao consultar pedidos do cartão: {e}")
+            return []
+
     def consultar_pedidos_por_id(self, id_pedido):
         try:
             url = f"{CONFIG.API_BASE_URL}/pedido/{id_pedido}"
