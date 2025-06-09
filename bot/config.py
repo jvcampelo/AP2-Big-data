@@ -8,4 +8,4 @@ class DefaultConfig:
     APP_PASSWORD = os.environ.get("MicrosoftAppPassword", "")
     
     # URL da API hospedada no Azure
-    API_BASE_URL = "http://localhost:8000"
+    API_BASE_URL = "https://ibmecmall-bmb0dne6d5ebbmg6.eastus-01.azurewebsites.net"
