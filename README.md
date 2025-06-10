@@ -34,6 +34,11 @@ O projeto utiliza dois bancos de dados:
 2. Azure Cosmos DB para dados não estruturados
 
 As configurações de conexão estão no arquivo `app/config.py`
+
+
+
+### api rodando na nuvem 
+-https://ibmecmall-bmb0dne6d5ebbmg6.eastus-01.azurewebsites.net/docs
 ```
 
 
