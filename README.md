@@ -1,10 +1,7 @@
 
 
-# Projeto AP2 Big Data - IBMEC
+# Projeto chatbot de compra de produtos
 
-## Integrantes do Grupo
-- João Victor G Campelo - 202208385151
-- Matheus Pecanha Cavalcante - 202208385011
 
 
 ## Tecnologias Utilizadas
